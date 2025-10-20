@@ -18,8 +18,13 @@ FROM debian:bookworm-slim
 
 WORKDIR /app
 
-# Copiar el binario compilado y los archivos web
-COPY --from=builder /focalboard-server /app/
+# Crear el directorio 'bin' si no existe, ya que Railway parece esperarlo
+RUN mkdir -p bin
+
+# Copiar el binario compilado al directorio 'bin'
+COPY --from=builder /focalboard-server /app/bin/
+
+# Copiar los archivos web
 COPY webapp /app/webapp
 
 # Configuración por defecto
@@ -29,4 +34,7 @@ ENV DB_CONFIG=./focalboard.db
 
 EXPOSE 8000
 
-CMD ["./focalboard-server"]
+# Cambiar el CMD para que use la ruta completa al ejecutable, o la ruta relativa esperada.
+# Usaremos la ruta completa para mayor fiabilidad.
+# También puedes probar: CMD ["./bin/focalboard-server"]
+CMD ["/app/bin/focalboard-server"]
