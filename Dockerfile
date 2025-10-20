@@ -2,9 +2,21 @@
 FROM golang:1.22-bookworm AS builder
 
 WORKDIR /app
+
+# Copiar todo el código fuente
 COPY . .
+
+# Ir a la carpeta donde está el main.go
 WORKDIR /app/server/main
+
+# Descargar dependencias y compilar el binario
 RUN go mod download
+
+# 👇 CAMBIO CLAVE: Usa CGO_ENABLED=1 para permitir la compilación con CGO
+# SQLite a menudo requiere CGO para enlazar con las librerías C de sqlite.
+# Nota: La imagen base 'golang:1.22-bookworm' ya tiene GCC y C libs, lo cual es necesario.
+RUN CGO_ENABLED=1 go build -o /focalboard-server
+
 RUN go build -o /focalboard-server
 
 # Etapa 2: imagen final
