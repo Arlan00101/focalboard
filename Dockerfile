@@ -1,5 +1,5 @@
 # Imagen base oficial de Go
-FROM golang:1.21-buster AS builder
+FROM golang:1.22-bookworm AS builder
 
 # Instalar dependencias
 RUN apt-get update && apt-get install -y make git
