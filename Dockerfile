@@ -3,13 +3,13 @@ FROM golang:1.22-bookworm AS builder
 
 WORKDIR /app
 
-# Copiar TODO el código fuente
+# Copiar todo el código fuente
 COPY . .
 
-# Moverse a la carpeta del servidor
-WORKDIR /app/server
+# Ir a la carpeta donde está el main.go
+WORKDIR /app/server/main
 
-# Descargar dependencias y compilar
+# Descargar dependencias y compilar el binario
 RUN go mod download
 RUN go build -o /focalboard-server
 
@@ -18,7 +18,7 @@ FROM debian:bookworm-slim
 
 WORKDIR /app
 
-# Copiar binario y recursos web
+# Copiar el binario compilado y los archivos web
 COPY --from=builder /focalboard-server /app/
 COPY webapp /app/webapp
 
