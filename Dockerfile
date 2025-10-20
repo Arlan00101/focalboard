@@ -7,21 +7,26 @@ RUN apt-get update && apt-get install -y git
 # Crear directorio de trabajo
 WORKDIR /app
 
-# Copiar archivos del repo
+# Copiar todo el proyecto
 COPY . .
 
-# Compilar el servidor Focalboard
-RUN cd server && go build -o /app/focalboard-server
+# Verificar dónde está el código Go
+# (algunas versiones lo tienen en cmd/focalboard-server)
+RUN if [ -d cmd/focalboard-server ]; then \
+        cd cmd/focalboard-server && go build -o /app/focalboard-server ; \
+    else \
+        go build -o /app/focalboard-server ; \
+    fi
 
-# Etapa 2: imagen final
+# Etapa 2: imagen final ligera
 FROM debian:bookworm-slim
 
 WORKDIR /app
 
-# Copiar binario compilado desde la etapa anterior
+# Copiar binario del builder
 COPY --from=builder /app/focalboard-server /app/
 
-# Copiar assets (interfaz web)
+# Copiar assets web si existen
 COPY webapp /app/webapp
 
 # Variables de entorno por defecto
