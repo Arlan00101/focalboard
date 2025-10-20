@@ -2,14 +2,8 @@
 FROM golang:1.22-bookworm AS builder
 
 WORKDIR /app
-
-# Copiar todo el código fuente
 COPY . .
-
-# Ir a la carpeta donde está el main.go
 WORKDIR /app/server/main
-
-# Descargar dependencias y compilar el binario
 RUN go mod download
 RUN go build -o /focalboard-server
 
@@ -18,16 +12,17 @@ FROM debian:bookworm-slim
 
 WORKDIR /app
 
-# Crear el directorio 'bin' si no existe, ya que Railway parece esperarlo
+# 1. Crear el directorio 'bin'
 RUN mkdir -p bin
 
 # Copiar el binario compilado al directorio 'bin'
 COPY --from=builder /focalboard-server /app/bin/
 
-# Copiar los archivos web
-COPY webapp /app/webapp
+# 2. Corregido: Copia el server-config.json desde la raíz y lo renombra a config.json
+COPY server-config.json /app/config.json
 
-COPY server/config/config.json /app/
+# 3. Corregido: Copia la carpeta 'webapp' al destino './pack' para que coincida con el JSON
+COPY webapp /app/pack
 
 # Configuración por defecto
 ENV SERVER_PORT=8000
@@ -36,7 +31,4 @@ ENV DB_CONFIG=./focalboard.db
 
 EXPOSE 8000
 
-# Cambiar el CMD para que use la ruta completa al ejecutable, o la ruta relativa esperada.
-# Usaremos la ruta completa para mayor fiabilidad.
-# También puedes probar: CMD ["./bin/focalboard-server"]
 CMD ["/app/bin/focalboard-server"]
