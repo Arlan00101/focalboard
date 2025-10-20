@@ -1,32 +1,25 @@
-# Etapa 1: build
+# Etapa 1: compilación
 FROM golang:1.22-bookworm AS builder
 
-# Instalar dependencias básicas
-RUN apt-get update && apt-get install -y git
-
-# Crear directorio de trabajo
+# Establecer directorio de trabajo
 WORKDIR /app
 
-# Copiar todo el proyecto
-COPY . .
+# Copiar solo los archivos necesarios para compilar
+COPY server ./server
+COPY go.* ./
 
-# Verificar dónde está el código Go
-# (algunas versiones lo tienen en cmd/focalboard-server)
-RUN if [ -d cmd/focalboard-server ]; then \
-        cd cmd/focalboard-server && go build -o /app/focalboard-server ; \
-    else \
-        go build -o /app/focalboard-server ; \
-    fi
+# Entrar a la carpeta del servidor y compilar
+WORKDIR /app/server
+RUN go mod download
+RUN go build -o /focalboard-server
 
-# Etapa 2: imagen final ligera
+# Etapa 2: imagen final
 FROM debian:bookworm-slim
 
 WORKDIR /app
 
-# Copiar binario del builder
-COPY --from=builder /app/focalboard-server /app/
-
-# Copiar assets web si existen
+# Copiar binario compilado y recursos web
+COPY --from=builder /focalboard-server /app/
 COPY webapp /app/webapp
 
 # Variables de entorno por defecto
@@ -34,8 +27,6 @@ ENV SERVER_PORT=8000
 ENV DB_TYPE=sqlite3
 ENV DB_CONFIG=./focalboard.db
 
-# Exponer puerto
 EXPOSE 8000
 
-# Comando de inicio
 CMD ["./focalboard-server"]
