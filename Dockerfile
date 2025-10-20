@@ -27,6 +27,8 @@ COPY --from=builder /focalboard-server /app/bin/
 # Copiar los archivos web
 COPY webapp /app/webapp
 
+COPY server/config/config.json /app/
+
 # Configuración por defecto
 ENV SERVER_PORT=8000
 ENV DB_TYPE=sqlite3
