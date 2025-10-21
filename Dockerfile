@@ -36,11 +36,6 @@ COPY server-config.json /app/config.json
 # 3. Corregido: Copia la carpeta 'webapp' al destino './pack' para que coincida con el JSON
 COPY webapp /app/pack
 
-# Configuración por defecto
-ENV SERVER_PORT=8000
-ENV DB_TYPE=sqlite3
-ENV DB_CONFIG=./focalboard.db
-
 EXPOSE 8000
 
 CMD ["/app/bin/focalboard-server"]
