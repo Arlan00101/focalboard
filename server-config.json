@@ -2,7 +2,7 @@
     "serverRoot": "http://localhost:8000",
     "port": 8000,
     "dbtype": "postgres",
-	"dbconfig": "postgresql://postgres:wLjKypuVSEEYOYyrDBLkAPGkbjFXAAQL@postgres.railway.internal:5432/railway",
+	"dbconfig": "postgres://$(PGUSER):$(PGPASSWORD)@$(PGHOST):$(PGPORT)/$(PGDATABASE)?sslmode=disable",
     "postgres_dbconfig": "dbname=focalboard sslmode=disable",
     "useSSL": false,
     "webpath": "./pack",
